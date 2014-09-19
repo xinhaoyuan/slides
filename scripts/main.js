@@ -97,6 +97,8 @@ require(["jquery-ui"], function () {
 
         config = $('#slides');
         slidesArrange = config.attr('arrange');
+        if (config.attr('title')) 
+            document.title = config.attr('title');
 
         slides = $('.slide');
         slideFrame = $('#slide-frame');
