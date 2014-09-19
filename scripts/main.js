@@ -107,8 +107,13 @@ require(["jquery-ui"], function () {
         // turn on the slides
         $("body").css('visibility', 'visible');
 
-        if (window.opener)
+        if (window.opener) {
+            $(window.opener).bind('beforeunload', function(e) {
+                window.close();
+            });
             window.opener.postMessage({ command : 'childReady' }, '*');
+        }
+        
     }
 
     function resizeEvent() {
@@ -224,11 +229,11 @@ require(["jquery-ui"], function () {
     $(window).resize(resizeEvent);
 
     $(document).keydown(function (e) {
-        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return true;
         var key = e.which;
         // console.log(key);
 
         if(key == 8 || key == 37 || key == 38) {
+            if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return true;
             // bs, left and up
             e.preventDefault();
             if (window.opener) return false;
@@ -237,6 +242,7 @@ require(["jquery-ui"], function () {
                 controlPair.postMessage({ command : 'prev' }, '*');
             return false;
         } else if (key == 32 || key == 39 || key == 40) {
+            if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return true;
             // space, right and down
             e.preventDefault();
             if (window.opener) return false;
@@ -246,9 +252,13 @@ require(["jquery-ui"], function () {
             return false;
         } else if (key == 79) {
             // o
+            var option;
+            if (e.shiftKey) 
+                option = '';
+            else option = 'status=no,location=no,menubar=no,toolbar=no';
             if (window.opener) return false;
             if (!controlPair) {
-                window.open(window.location, '', 'status=no,location=no,menubar=no,toolbar=no');
+                window.open(window.location, '', option);
             }
         }
         return true;
@@ -288,9 +298,11 @@ require(["jquery-ui"], function () {
         } else if (data.command == 'jump') {
             jump(data.index, data.step);
         } else if (data.command == 'childReady') {
+            $("body").addClass("controller");
             $(controlPair).bind('beforeunload', function(e) {
                 console.log('connection pair closed');
                 controlPair = null;
+                $("body").removeClass("controller");
             });
         }
     });

@@ -91,3 +91,15 @@ body {
 .status-index:last-child:after {
     content: "";
 }
+
+.secret {
+    display: none;
+}
+
+.controller .secret {
+    display: inline;
+}
+
+body.controller {
+    background: darkred;
+}
