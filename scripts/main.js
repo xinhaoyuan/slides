@@ -11,8 +11,7 @@ require(["jquery-ui"], function () {
     var currentStep;
     var slideSteps = [];
     var archors = {};
-    var stack = [[0, 0]];
-    var stackIndex = 0;
+    var controlPair = null;
 
     function preprocess(index, slide) {
         slideSteps[index] = [];
@@ -54,6 +53,7 @@ require(["jquery-ui"], function () {
     function preprocessAnchorJump(index, slide) {
 	    slide.find('a[href^="#"]').on('click', function (e) {
 	        e.preventDefault();
+            if (window.opener) return false;
             
 	        var target = this.hash.substring(1);
             if (target in archors) {
@@ -63,6 +63,8 @@ require(["jquery-ui"], function () {
                 } else {
                     push(archor, 0);
                 }
+                if (controlPair) 
+                    controlPair.postMessage({ command : 'jump', index: currentIndex, step: currentStep }, '*');
             }
 
             return false;
@@ -70,24 +72,7 @@ require(["jquery-ui"], function () {
     }
 
     function push(index, step) {
-        while (stackIndex < stack.length - 1) 
-            stack.pop();
-
-        stack[stackIndex] = [currentIndex, currentStep];
-        stack.push([index, step]);
-        stackIndex = stack.length - 1;
-
-        jump(index, step);
-    }
-
-    function stackJump(offset) {
-        stack[stackIndex] = [currentIndex, currentStep];
-
-        if (stackIndex + offset >= 0 && 
-            stackIndex + offset <  stack.length) {
-            stackIndex = stackIndex + offset;
-            jump(stack[stackIndex][0], stack[stackIndex][1]);
-        }
+        window.location.hash = '#' + index + ',' + step;
     }
 
     function init() {
@@ -117,9 +102,13 @@ require(["jquery-ui"], function () {
         });
 
         resizeEvent();
-        jump(0, 0);
+        hashUpdate();
+
         // turn on the slides
         $("body").css('visibility', 'visible');
+
+        if (window.opener)
+            window.opener.postMessage({ command : 'childReady' }, '*');
     }
 
     function resizeEvent() {
@@ -144,13 +133,15 @@ require(["jquery-ui"], function () {
             jumpPage(index, true);
             jumpStep(step, false);
         } else {
-            jumpStep(step, true);
+            jumpStep(step, false);
         }
     }
 
     function jumpPage(index, animated) {
         offset = index * (slideWidth + slideMargin);
-        slidesOffsetContainer.animate({ 'left' : -offset });
+        if (animated)
+            slidesOffsetContainer.animate({ 'left' : -offset });
+        else slidesOffsetContainer.css('left', -offset);
         currentIndex = index;
     }
 
@@ -198,9 +189,10 @@ require(["jquery-ui"], function () {
         if (currentStep - 1 >= 0) {
             -- currentStep;
             $.each(slideSteps[currentIndex][currentStep], function(index, v) {
-                switchClass(v.element, v.element.data('currentClass'), v.before, true) 
+                switchClass(v.element, v.element.data('currentClass'), v.before, false) 
                 v.element.data('currentClass', v.before);
             });
+            updateStatus();
         } else if (currentIndex - 1 >= 0) {
             prevPage();
         }
@@ -213,44 +205,93 @@ require(["jquery-ui"], function () {
                 v.element.data('currentClass', v.after);
             });
             ++ currentStep;
+            updateStatus();
         } else if (currentIndex + 1 < slides.size()) { 
             nextPage();
         }
     }
 
     function updateStatus() {
-        text = '';
-        for (var i = 0; i < stack.length; ++ i) {
-            if (i == stackIndex) {
-                text += '<span class="status-index current">' + (currentIndex + 1) + '</span>';
-            } else {
-                text += '<span class="status-index">' + (stack[i][0] + 1) + '</span>';
-            }
-        }
+        text = '<span class="status-index">' + (currentIndex + 1) + '</span>';
         $('#status-bar').html(text);
+        hash = '#' + currentIndex + ',' + currentStep;
+        console.log(hash);
+        if (window.location.hash != hash)
+            window.location.replace(hash);
     }
 
     $(document).ready(init);
     $(window).resize(resizeEvent);
 
-    $(document).keydown(function(e) {
+    $(document).keydown(function (e) {
+        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return true;
         var key = e.which;
         // console.log(key);
-        if(key == 37 || key == 38) {
+
+        if(key == 8 || key == 37 || key == 38) {
+            // bs, left and up
             e.preventDefault();
+            if (window.opener) return false;
             prevStep();
+            if (controlPair) 
+                controlPair.postMessage({ command : 'prev' }, '*');
             return false;
-        } else if (key == 39 || key == 40) {
+        } else if (key == 32 || key == 39 || key == 40) {
+            // space, right and down
             e.preventDefault();
+            if (window.opener) return false;
             nextStep();
+            if (controlPair) 
+                controlPair.postMessage({ command : 'next' }, '*');
             return false;
-        } else if (key == 219) {
-            e.preventDefault();
-            stackJump(-1);
-        } else if (key == 221) {
-            e.preventDefault();
-            stackJump(1);
+        } else if (key == 79) {
+            // o
+            if (window.opener) return false;
+            if (!controlPair) {
+                window.open(window.location, '', 'status=no,location=no,menubar=no,toolbar=no');
+            }
         }
         return true;
+    });
+
+    function hashUpdate (e) {
+        var index, step;
+        if (window.location.hash.length == 0) {
+            index = 0;
+            step = 0;
+        } else {
+            var m = window.location.hash.match(/^#([0-9]+),([0-9]+)$/);
+            if (!m) return;
+            index = parseInt(m[1]);
+            step = parseInt(m[2]);
+        }
+        if (index != currentIndex || step != currentStep)
+            jump(index, step);
+    }
+
+    $(window).bind('hashchange', hashUpdate);
+
+    $(window).on('message', function(e) {
+        e = e.originalEvent;
+        console.log(e);
+
+        if (!controlPair)
+            controlPair = e.source;
+        else if (controlPair !== e.source) return;
+        
+        console.log('message: ' + e.data);
+        data = e.data;
+        if (data.command == 'next') {
+            nextStep();
+        } else if (data.command == 'prev') {
+            prevStep();
+        } else if (data.command == 'jump') {
+            jump(data.index, data.step);
+        } else if (data.command == 'childReady') {
+            $(controlPair).bind('beforeunload', function(e) {
+                console.log('connection pair closed');
+                controlPair = null;
+            });
+        }
     });
 });
