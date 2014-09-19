@@ -1,4 +1,4 @@
-require(["jquery"], function ($) {
+require(["jquery-ui"], function () {
 
     var slides;
     var slideFrame;
@@ -131,9 +131,12 @@ require(["jquery"], function ($) {
     }
 
     function switchClass(ele, before, after, animated) {
-        // XXX: animated
-        ele.removeClass(before);
-        ele.addClass(after);
+        if (animated) {
+            ele.switchClass(before, after);
+        } else {
+            ele.removeClass(before);
+            ele.addClass(after);
+        }
     }
 
     function jump(index, step) {
@@ -147,8 +150,7 @@ require(["jquery"], function ($) {
 
     function jumpPage(index, animated) {
         offset = index * (slideWidth + slideMargin);
-        // XXX: animated?
-        slidesOffsetContainer.css('left', -offset);
+        slidesOffsetContainer.animate({ 'left' : -offset });
         currentIndex = index;
     }
 

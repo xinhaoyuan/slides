@@ -55,11 +55,11 @@ body {
 }
 
 .hidden {
-    visibility: hidden;
+    opacity: 0;
 }
 
 .visible {
-    visibility: visible;
+    opacity: 1;
 }
 
 #status-bar {
