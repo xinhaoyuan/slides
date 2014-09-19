@@ -341,7 +341,7 @@ require(["jquery-ui"], function () {
         $('#slides-container').load('slides.html #slides', function (response, status, xhr) {
             if (status == 'error') {
                 console.log('cannot load slide.html, load sample instead.');
-                $('#slides').load('slides.sample.html #slides', init);
+                $('#slides-container').load('slides.sample.html #slides', init);
             } else {
                 init();
             }

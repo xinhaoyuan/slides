@@ -1,11 +1,26 @@
 <div id="slides" arrange="vertical" title="Sample Slides">
   <div class="slide">
     <a name="archor" step="1"></a>
-    <h1>This is the first slide</h1>
-    <h2 steps="hidden,0,visible,1,hidden">H2</h2>
-    <h3 steps="hidden,1,visible">H3<span class="secret">Do not show</span></h3>
+    <h1>What is this?</h1>
+    <ul>
+      <li steps="hidden,0,visible,1,hidden">A minimalistic html 5 slide app</li>
+      <li steps="hidden,1,visible,2,hidden">play slides written in html</li>
+      <li steps="hidden,2,visible,3,hidden">with some necessary effects, not fancy though</li>
+      <li steps="hidden,3,visible">can support internal archors and <a href="#archor">jumps</a> with browser history support</li>
+    </ul>
   </div><div class="slide">
-    <h1>This is the second slide</h1>
-    <h2 steps="hidden,1,visible">And this is the end, jump to <a href="#archor">begin</a></h2>
+    <h1>Keybindings</h1>
+    <ul>
+      <li>Space, right, down - next slide</li>
+      <li steps="hidden,0,visible">Backspace, left, up - prev slide</li>
+      <li steps="hidden,1,visible">o - enter presenting mode (the original window becomes the controller)</li>
+    </ul>
+  </div>
+  <div class="slide">
+    <div style="display: table; width: 100%; height: 100%">
+      <div style="display: table-cell; vertical-align: middle; text-align: center">
+        <h1 style="display: inline-block;">That's it. Enjoy!</h1>
+      </div>
+    </div>
   </div>
 </div>
