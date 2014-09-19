@@ -7,6 +7,7 @@ require(["jquery-ui"], function () {
     var slideWidth;
     var slideHeight;
     var slideMargin;
+    var slideArrange;
     var currentIndex;
     var currentStep;
     var slideSteps = [];
@@ -93,14 +94,21 @@ require(["jquery-ui"], function () {
     }
 
     function init() {
-        
+
+        config = $('#slides');
+        slidesArrange = config.attr('arrange');
+        console.log(slidesArrange);
+
         slides = $('.slide');
         slideFrame = $('#slide-frame');
-        slidesContainer = $('#slides');
+        slidesContainer = $('#slides-container');
 
         slideWidth  = slides.width();
         slideHeight = slides.height();
-        slideMargin = parseInt(slides.css('margin-right'));
+        if (slidesArrange == 'horizontal')
+            slideMargin = parseInt(slides.css('margin-right'));
+        else
+            slideMargin = parseInt(slides.css('margin-bottom'));
 
         slideFrame.css('width', slideWidth);
         slideFrame.css('height', slideHeight);
@@ -118,6 +126,11 @@ require(["jquery-ui"], function () {
             preprocessAnchorJump(index, $(slide));
         });
 
+        $(window).resize(resizeEvent);
+        $(document).keydown(processKeydown);
+        $(window).bind('hashchange', hashUpdate);
+        $(window).on('message', processMessage);
+
         resizeEvent();
         hashUpdate();
 
@@ -130,7 +143,6 @@ require(["jquery-ui"], function () {
             });
             window.opener.postMessage({ command : 'childReady' }, '*');
         }
-        
     }
 
     function resizeEvent() {
@@ -160,10 +172,18 @@ require(["jquery-ui"], function () {
     }
 
     function jumpPage(index, animated) {
-        offset = index * (slideWidth + slideMargin);
+        var prop;
+        var offset;
+
+        if (slidesArrange == 'horizontal') {
+            prop = { 'left' : -index * (slideWidth + slideMargin) };
+        } else {
+            prop = { 'top' : -index * (slideHeight + slideMargin) };
+        }
+         
         if (animated)
-            slidesOffsetContainer.animate({ 'left' : -offset });
-        else slidesOffsetContainer.css('left', -offset);
+            slidesOffsetContainer.animate(prop);
+        else slidesOffsetContainer.css(prop);
         currentIndex = index;
     }
 
@@ -241,9 +261,7 @@ require(["jquery-ui"], function () {
             window.location.replace(hash);
     }
 
-    $(window).resize(resizeEvent);
-
-    $(document).keydown(function (e) {
+    function processKeydown(e) {
         var key = e.which;
         // console.log(key);
 
@@ -277,7 +295,7 @@ require(["jquery-ui"], function () {
             }
         }
         return true;
-    });
+    }
 
     function hashUpdate (e) {
         var index, step;
@@ -294,9 +312,7 @@ require(["jquery-ui"], function () {
             jump(index, step);
     }
 
-    $(window).bind('hashchange', hashUpdate);
-
-    $(window).on('message', function(e) {
+    function processMessage(e) {
         e = e.originalEvent;
         if (!controlPair)
             controlPair = e.source;
@@ -318,9 +334,18 @@ require(["jquery-ui"], function () {
                 deactivateController();
             });
         }
-    });
+    }
 
     $(window).ready(function () {
-        $('#slides').load('slides.html .slide', init);
+        $('#slides-container').load('slides.html #slides', function (response, status, xhr) {
+            if (status == 'error') {
+                console.log('cannot load slide.html, load sample instead.');
+                $('#slides').load('slides.sample.html #slides', init);
+            } else {
+                console.log('slides loaded');
+                init();
+            }
+        });
+        console.log('load issued');
     });
 });

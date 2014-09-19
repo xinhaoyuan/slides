@@ -17,7 +17,7 @@ body {
 }
 
 
-#slides {
+#slides-container {
     position   : absolute;
 }
 
@@ -26,9 +26,8 @@ body {
     white-space : nowrap;
 }
 
-#slides .slide {
+.slide {
     position      : relative;
-    display       : inline-block;
 }
 
 .slide-inner {
@@ -47,9 +46,9 @@ body {
 }
 
 .slide {
-    width         : 800px;
+    width         : 960px;
     height        : 600px;
-    margin-right  : 100px;
+    margin-bottom : 30px;
     border-radius : 10px;
     background    : white;
 }
