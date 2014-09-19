@@ -96,8 +96,7 @@ body {
     display: none;
 }
 
-.controller .secret {
-    display: inline;
+.secret-controller {
 }
 
 body.controller {

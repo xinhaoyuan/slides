@@ -12,6 +12,7 @@ require(["jquery-ui"], function () {
     var slideSteps = [];
     var archors = {};
     var controlPair = null;
+    var useAnimate = true;
 
     function preprocess(index, slide) {
         slideSteps[index] = [];
@@ -75,6 +76,22 @@ require(["jquery-ui"], function () {
         window.location.hash = '#' + index + ',' + step;
     }
 
+    function activateController() {
+        useAnimate = false;
+        $('.secret')
+            .removeClass('secret')
+            .addClass('secret-controller');
+        $("body").addClass('controller');
+    }
+
+    function deactivateController() {
+        useAnimate = true;
+        $('.secret-controller')
+            .removeClass('.secret-controller')
+            .addClass('.secret');
+        $("body").removeClass('controller');
+    }
+
     function init() {
         
         slides = $('.slide');
@@ -135,7 +152,7 @@ require(["jquery-ui"], function () {
 
     function jump(index, step) {
         if (index != currentIndex) {
-            jumpPage(index, true);
+            jumpPage(index, useAnimate);
             jumpStep(step, false);
         } else {
             jumpStep(step, false);
@@ -178,14 +195,14 @@ require(["jquery-ui"], function () {
 
     function prevPage() {
         if (currentIndex - 1 >= 0) {
-            jumpPage(currentIndex - 1, true);
+            jumpPage(currentIndex - 1, useAnimate);
             jumpStep(slideSteps[currentIndex].length, false);
         }
     }
 
     function nextPage() {
         if (currentIndex + 1< slides.size()) {
-            jumpPage(currentIndex + 1, true);
+            jumpPage(currentIndex + 1, useAnimate);
             jumpStep(0, false);
         }
     }
@@ -206,7 +223,7 @@ require(["jquery-ui"], function () {
     function nextStep() {
         if (currentStep < slideSteps[currentIndex].length) {
             $.each(slideSteps[currentIndex][currentStep], function(index, v) {
-                switchClass(v.element, v.element.data('currentClass'), v.after, true) 
+                switchClass(v.element, v.element.data('currentClass'), v.after, useAnimate) 
                 v.element.data('currentClass', v.after);
             });
             ++ currentStep;
@@ -298,11 +315,11 @@ require(["jquery-ui"], function () {
         } else if (data.command == 'jump') {
             jump(data.index, data.step);
         } else if (data.command == 'childReady') {
-            $("body").addClass("controller");
+            activateController();
             $(controlPair).bind('beforeunload', function(e) {
                 console.log('connection pair closed');
                 controlPair = null;
-                $("body").removeClass("controller");
+                deactivateController();
             });
         }
     });
