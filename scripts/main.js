@@ -237,12 +237,10 @@ require(["jquery-ui"], function () {
         text = '<span class="status-index">' + (currentIndex + 1) + '</span>';
         $('#status-bar').html(text);
         hash = '#' + currentIndex + ',' + currentStep;
-        console.log(hash);
         if (window.location.hash != hash)
             window.location.replace(hash);
     }
 
-    $(document).ready(init);
     $(window).resize(resizeEvent);
 
     $(document).keydown(function (e) {
@@ -300,13 +298,11 @@ require(["jquery-ui"], function () {
 
     $(window).on('message', function(e) {
         e = e.originalEvent;
-        console.log(e);
-
         if (!controlPair)
             controlPair = e.source;
         else if (controlPair !== e.source) return;
         
-        console.log('message: ' + e.data);
+        // console.log('message: ' + e.data);
         data = e.data;
         if (data.command == 'next') {
             nextStep();
@@ -322,5 +318,9 @@ require(["jquery-ui"], function () {
                 deactivateController();
             });
         }
+    });
+
+    $(window).ready(function () {
+        $('#slides').load('slides.html .slide', init);
     });
 });
