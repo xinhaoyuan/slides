@@ -97,7 +97,6 @@ require(["jquery-ui"], function () {
 
         config = $('#slides');
         slidesArrange = config.attr('arrange');
-        console.log(slidesArrange);
 
         slides = $('.slide');
         slideFrame = $('#slide-frame');
@@ -188,7 +187,7 @@ require(["jquery-ui"], function () {
     }
 
     function jumpStep(step, animated) {
-        // console.log("jump to " + step);
+        // console.log('jump to ' + step);
         $(slides.get(currentIndex)).find('[steps]').each(function (index, ele) {
             ele = $(ele);
             ele.data('targetClass', ele.data('initialClass'));
@@ -342,10 +341,8 @@ require(["jquery-ui"], function () {
                 console.log('cannot load slide.html, load sample instead.');
                 $('#slides').load('slides.sample.html #slides', init);
             } else {
-                console.log('slides loaded');
                 init();
             }
         });
-        console.log('load issued');
     });
 });
