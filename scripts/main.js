@@ -1,5 +1,6 @@
 require(["jquery-ui"], function () {
 
+    var config;
     var slides;
     var slideFrame;
     var slidesContainer;
@@ -13,7 +14,9 @@ require(["jquery-ui"], function () {
     var slideSteps = [];
     var archors = {};
     var controlPair = null;
-    var useAnimate = true;
+    var animatedConfig;
+    var animatedDefault;
+    var animated;
 
     function preprocess(index, slide) {
         slideSteps[index] = [];
@@ -78,7 +81,7 @@ require(["jquery-ui"], function () {
     }
 
     function activateController() {
-        useAnimate = false;
+        animatedDefault = false;
         $('.secret')
             .removeClass('secret')
             .addClass('secret-controller');
@@ -86,7 +89,7 @@ require(["jquery-ui"], function () {
     }
 
     function deactivateController() {
-        useAnimate = true;
+        animatedDefault = animatedConfig; 
         $('.secret-controller')
             .removeClass('.secret-controller')
             .addClass('.secret');
@@ -96,9 +99,13 @@ require(["jquery-ui"], function () {
     function init() {
 
         config = $('#slides');
-        slidesArrange = config.attr('arrange');
+        if (!(slidesArrange = config.attr('arrange')))
+            slideArrange = 'horizontal';
         if (config.attr('title')) 
             document.title = config.attr('title');
+        if (!(animatedConfig = config.attr('animated'))) 
+            animatedConfig = true;
+        animatedDefault = animated = animatedConfig;
 
         slides = $('.slide');
         slideFrame = $('#slide-frame');
@@ -133,6 +140,7 @@ require(["jquery-ui"], function () {
         $(window).on('message', processMessage);
 
         resizeEvent();
+        animated = false;
         hashUpdate();
 
         // turn on the slides
@@ -165,7 +173,7 @@ require(["jquery-ui"], function () {
 
     function jump(index, step) {
         if (index != currentIndex) {
-            jumpPage(index, useAnimate);
+            jumpPage(index, animated);
             jumpStep(step, false);
         } else {
             jumpStep(step, false);
@@ -216,14 +224,14 @@ require(["jquery-ui"], function () {
 
     function prevPage() {
         if (currentIndex - 1 >= 0) {
-            jumpPage(currentIndex - 1, useAnimate);
+            jumpPage(currentIndex - 1, animated);
             jumpStep(slideSteps[currentIndex].length, false);
         }
     }
 
     function nextPage() {
         if (currentIndex + 1< slides.size()) {
-            jumpPage(currentIndex + 1, useAnimate);
+            jumpPage(currentIndex + 1, animated);
             jumpStep(0, false);
         }
     }
@@ -244,7 +252,7 @@ require(["jquery-ui"], function () {
     function nextStep() {
         if (currentStep < slideSteps[currentIndex].length) {
             $.each(slideSteps[currentIndex][currentStep], function(index, v) {
-                switchClass(v.element, v.element.data('currentClass'), v.after, useAnimate) 
+                switchClass(v.element, v.element.data('currentClass'), v.after, animated) 
                 v.element.data('currentClass', v.after);
             });
             ++ currentStep;
@@ -260,6 +268,7 @@ require(["jquery-ui"], function () {
         hash = '#' + currentIndex + ',' + currentStep;
         if (window.location.hash != hash)
             window.location.replace(hash);
+        animated = animatedDefault;
     }
 
     function processKeydown(e) {
