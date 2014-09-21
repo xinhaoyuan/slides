@@ -271,6 +271,18 @@ require(["jquery-ui"], function () {
         animated = animatedDefault;
     }
 
+    function uiPrev() {
+        prevStep();
+        if (controlPair) 
+            controlPair.postMessage({ command : 'prev' }, '*');
+    }
+
+    function uiNext() {
+        nextStep();
+        if (controlPair) 
+            controlPair.postMessage({ command : 'next' }, '*');
+    }
+
     function processKeydown(e) {
         var key = e.which;
         // console.log(key);
@@ -280,18 +292,14 @@ require(["jquery-ui"], function () {
             // bs, left and up
             e.preventDefault();
             if (window.opener) return false;
-            prevStep();
-            if (controlPair) 
-                controlPair.postMessage({ command : 'prev' }, '*');
+            uiPrev();
             return false;
         } else if (key == 32 || key == 39 || key == 40) {
             if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return true;
             // space, right and down
             e.preventDefault();
             if (window.opener) return false;
-            nextStep();
-            if (controlPair) 
-                controlPair.postMessage({ command : 'next' }, '*');
+            uiNext();
             return false;
         } else if (key == 79) {
             // o
