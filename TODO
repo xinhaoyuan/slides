@@ -1,2 +1,0 @@
-- switchClass does not support 'visibility', so using opacity for fade
-  in/out. This means transparent contents are clickable.
