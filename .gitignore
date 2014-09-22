@@ -1,5 +1,4 @@
-*
-!defaults
-!scripts
+./*
+!.gitignore
 !main.html
 
