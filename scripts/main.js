@@ -167,10 +167,11 @@ require(["jquery-ui"], function () {
 
     function switchClass(ele, before, after, animated) {
         if (animated) {
-            ele.switchClass(before, after);
+            ele.stop(true, true).switchClass(before, after);
         } else {
-            ele.removeClass(before);
-            ele.addClass(after);
+            ele.stop(true, true)
+                .removeClass(before)
+                .addClass(after);
         }
     }
 
@@ -194,8 +195,8 @@ require(["jquery-ui"], function () {
         }
          
         if (animated)
-            slidesOffsetContainer.animate(prop);
-        else slidesOffsetContainer.css(prop);
+            slidesOffsetContainer.stop(true, true).animate(prop);
+        else slidesOffsetContainer.stop(true, true).css(prop);
         currentIndex = index;
     }
 
