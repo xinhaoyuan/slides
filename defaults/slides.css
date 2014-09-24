@@ -27,7 +27,8 @@ body {
 }
 
 .slide {
-    position      : relative;
+    position    : relative;
+    white-space : normal;
 }
 
 .slide-inner {
@@ -37,6 +38,25 @@ body {
     top      : 0;
     bottom   : 0;
     padding  : 10px;
+}
+
+.slide.center {
+    display: table;
+}
+
+.slide.center .slide-inner {
+    position: relative;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#open-presenter {
+    visibility: hidden;
+}
+
+#open-presenter.show {
+    visibility: visible;
 }
 
 /* themeable */
@@ -100,4 +120,13 @@ body {
 
 body.controller {
     background: darkred;
+}
+
+#open-presenter {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 5px;
+    background: white;
+    border-radius: 5px;
 }

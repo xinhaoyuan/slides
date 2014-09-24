@@ -81,19 +81,20 @@ require(["jquery-ui"], function () {
     }
 
     function activateController() {
-        animatedDefault = false;
+        animated = animatedDefault = false;
         $('.secret')
             .removeClass('secret')
             .addClass('secret-controller');
-        $("body").addClass('controller');
+        $('body').addClass('controller');
+        $('#open-presenter').removeClass('show');
     }
 
     function deactivateController() {
-        animatedDefault = animatedConfig; 
+        animated = animatedDefault = animatedConfig; 
         $('.secret-controller')
             .removeClass('.secret-controller')
             .addClass('.secret');
-        $("body").removeClass('controller');
+        $('body').removeClass('controller');
     }
 
     function init() {
@@ -155,6 +156,8 @@ require(["jquery-ui"], function () {
     }
 
     function resizeEvent() {
+        // console.log('window resize to ' + 
+        //             $(window).width() + ' ' + $(window).height());
         // keep the slide to the center of the screen
         slidesContainer.css('left', ($(window).width() - slideWidth) / 2);
         slidesContainer.css('top', ($(window).height() - slideHeight) / 2);
@@ -305,11 +308,17 @@ require(["jquery-ui"], function () {
             // o
             var option;
             if (e.shiftKey) 
-                option = '';
-            else option = 'status=no,location=no,menubar=no,toolbar=no';
+                options = '';
+            else options = 'status=no,location=no,menubar=no,toolbar=no';
             if (window.opener) return false;
             if (!controlPair) {
-                window.open(window.location, '', option);
+                w = window.open(window.location, '', options);
+                if (!w) {
+                    $('#open-presenter')
+                        .addClass('show')
+                        .html('<a href="' + window.location +
+                              '" target="_blank">Presenting Screen</a>');
+                }
             }
         }
         return true;
