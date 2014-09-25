@@ -369,9 +369,11 @@ require(["jquery-ui"], function () {
         slideFrame = $('#slide-frame');
         slidesContainer = $('#slides-container');
 
-        var dummySlide = $('<div class="slide"></div>');
+        var dummySlide = $('<div style="visibility: hidden;" class="slide"></div>')
+            .appendTo($('body'));
         slideWidth  = dummySlide.width();
         slideHeight = dummySlide.height();
+        dummySlide.remove();
 
         $(window).resize(resizeEvent);
         $(document).keydown(processKeydown);
