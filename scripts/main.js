@@ -13,7 +13,6 @@ require(["jquery-ui"], function () {
     var slideSteps = [];
     var archors = {};
     var controlPair = null;
-    var animatedConfig;
     var animatedDefault;
     var animated;
     var autoScale = undefined;
@@ -81,35 +80,43 @@ require(["jquery-ui"], function () {
     }
 
     function activateController() {
-        animated = animatedDefault = false;
         $('.secret')
             .removeClass('secret')
             .addClass('secret-controller');
         $('body').addClass('controller');
         $('#open-presenter').removeClass('show');
+
+        animated = animatedDefault = false;        
+        autoScale = undefined;
+        resizeEvent();
     }
 
     function deactivateController() {
-        animated = animatedDefault = animatedConfig; 
         $('.secret-controller')
             .removeClass('.secret-controller')
             .addClass('.secret');
         $('body').removeClass('controller');
+
+        setConfig();
+        resizeEvent();
     }
 
-    function preprocess() {
-
+    function setConfig() {
         config = $('#slides');
         if (!(slidesArrange = config.attr('arrange')))
             slideArrange = 'horizontal';
         if (config.attr('title')) 
             document.title = config.attr('title');
-        if (!(animatedConfig = config.attr('animated'))) 
-            animatedConfig = true;
-        animatedDefault = animated = animatedConfig;
+        if (!(animated = config.attr('animated'))) 
+            animated = true;
+        animatedDefault = animated;
         if (config.attr('autoScale'))
             autoScale = parseFloat(config.attr('autoScale'));
+    }
 
+    function preprocess() {
+
+        setConfig();
         slides = $('.slide');
 
         if (slidesArrange == 'horizontal')
@@ -127,6 +134,7 @@ require(["jquery-ui"], function () {
             preprocessSlideAnchorJump(index, $(slide));
         });
 
+        resizeEvent();
         animated = false;
         hashUpdate();
 
@@ -152,7 +160,7 @@ require(["jquery-ui"], function () {
             var scaleY = $(window).height() / slideHeight;
             var scale = scaleX < scaleY ? scaleX : scaleY;
             slideFrame.css('transform', 'scale(' + (scale * autoScale) + ')');
-        }
+        } else slideFrame.css('transform', '');
         slideFrame.css('left', ($('#screen').width() - slideWidth) / 2);
         slideFrame.css('top', ($('#screen').height() - slideHeight) / 2);
     }
@@ -382,8 +390,6 @@ require(["jquery-ui"], function () {
         $(document).keydown(processKeydown);
         $(window).bind('hashchange', hashUpdate);
         $(window).on('message', processMessage);
-
-        resizeEvent();
 
         if (window.opener) {
             $(window.opener).bind('beforeunload', function(e) {
