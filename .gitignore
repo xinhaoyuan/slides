@@ -2,3 +2,5 @@
 !.gitignore
 !*/
 !main.html
+!Makefile
+!generate_slides.py
