@@ -4,7 +4,6 @@ require(["jquery-ui"], function () {
     var slides;
     var slideFrame;
     var slidesContainer;
-    var slidesOffsetContainer;
     var slideWidth;
     var slideHeight;
     var slideMargin;
@@ -17,6 +16,7 @@ require(["jquery-ui"], function () {
     var animatedConfig;
     var animatedDefault;
     var animated;
+    var autoScale = undefined;
 
     function preprocessSlide(index, slide) {
         slideSteps[index] = [];
@@ -107,6 +107,8 @@ require(["jquery-ui"], function () {
         if (!(animatedConfig = config.attr('animated'))) 
             animatedConfig = true;
         animatedDefault = animated = animatedConfig;
+        if (config.attr('autoScale'))
+            autoScale = parseFloat(config.attr('autoScale'));
 
         slides = $('.slide');
 
@@ -114,12 +116,6 @@ require(["jquery-ui"], function () {
             slideMargin = parseInt(slides.css('margin-right'));
         else
             slideMargin = parseInt(slides.css('margin-bottom'));
-
-        slideFrame.css('width', slideWidth);
-        slideFrame.css('height', slideHeight);
-
-        slidesContainer.wrapInner('<div class="slides-offset"></div>');
-        slidesOffsetContainer = slidesContainer.children();
 
         slides.each(function (index, slide) {
             slide = $(slide);
@@ -151,10 +147,14 @@ require(["jquery-ui"], function () {
         // console.log('window resize to ' + 
         //             $(window).width() + ' ' + $(window).height());
         // keep the slide to the center of the screen
-        slidesContainer.css('left', ($(window).width() - slideWidth) / 2);
-        slidesContainer.css('top', ($(window).height() - slideHeight) / 2);
-        slideFrame.css('left', ($(window).width() - slideWidth) / 2);
-        slideFrame.css('top', ($(window).height() - slideHeight) / 2);
+        if (autoScale) {
+            var scaleX = $(window).width() / slideWidth;
+            var scaleY = $(window).height() / slideHeight;
+            var scale = scaleX < scaleY ? scaleX : scaleY;
+            slideFrame.css('transform', 'scale(' + (scale * autoScale) + ')');
+        }
+        slideFrame.css('left', ($('#screen').width() - slideWidth) / 2);
+        slideFrame.css('top', ($('#screen').height() - slideHeight) / 2);
     }
 
     function switchClass(ele, before, after, animated) {
@@ -187,8 +187,8 @@ require(["jquery-ui"], function () {
         }
          
         if (animated)
-            slidesOffsetContainer.stop(true, true).animate(prop);
-        else slidesOffsetContainer.stop(true, true).css(prop);
+            slidesContainer.stop(true, true).animate(prop);
+        else slidesContainer.stop(true, true).css(prop);
         currentIndex = index;
     }
 
@@ -374,6 +374,9 @@ require(["jquery-ui"], function () {
         slideWidth  = dummySlide.width();
         slideHeight = dummySlide.height();
         dummySlide.remove();
+
+        slideFrame.css('width', slideWidth);
+        slideFrame.css('height', slideHeight);
 
         $(window).resize(resizeEvent);
         $(document).keydown(processKeydown);

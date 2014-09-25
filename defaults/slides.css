@@ -1,27 +1,21 @@
 /* base */
 
-body {
-    padding    : 0;
-    margin     : 0;
-    overflow   : hidden;
-}
-
-body.no-slides > * {
-    visibility : hidden;
+#screen {
+    position : fixed;
+    top      : 0;
+    bottom   : 0;
+    left     : 0;
+    right    : 0;
+    overflow : hidden;
 }
 
 #slide-frame {
-    position : fixed;
-    visibility: hidden;
-}
-
-#slide-frame > * {
-    visibility: visible;
+    position : absolute;
 }
 
 
 #slides-container {
-    position   : absolute;
+    position : absolute;
 }
 
 .slides-offset {
@@ -90,7 +84,7 @@ body {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 10px;
     text-align: center;
 }
 
