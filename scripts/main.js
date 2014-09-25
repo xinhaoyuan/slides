@@ -18,7 +18,7 @@ require(["jquery-ui"], function () {
     var animatedDefault;
     var animated;
 
-    function preprocess(index, slide) {
+    function preprocessSlide(index, slide) {
         slideSteps[index] = [];
         var currentSteps = {}
         slide.find('[steps]').each(function (stepIndex, ele) {
@@ -55,7 +55,7 @@ require(["jquery-ui"], function () {
         });
     }
 
-    function preprocessAnchorJump(index, slide) {
+    function preprocessSlideAnchorJump(index, slide) {
 	    slide.find('a[href^="#"]').on('click', function (e) {
 	        e.preventDefault();
             if (window.opener) return false;
@@ -97,7 +97,7 @@ require(["jquery-ui"], function () {
         $('body').removeClass('controller');
     }
 
-    function init() {
+    function preprocess() {
 
         config = $('#slides');
         if (!(slidesArrange = config.attr('arrange')))
@@ -109,11 +109,7 @@ require(["jquery-ui"], function () {
         animatedDefault = animated = animatedConfig;
 
         slides = $('.slide');
-        slideFrame = $('#slide-frame');
-        slidesContainer = $('#slides-container');
 
-        slideWidth  = slides.width();
-        slideHeight = slides.height();
         if (slidesArrange == 'horizontal')
             slideMargin = parseInt(slides.css('margin-right'));
         else
@@ -128,31 +124,27 @@ require(["jquery-ui"], function () {
         slides.each(function (index, slide) {
             slide = $(slide);
             slide.wrapInner('<div class="slide-inner"></div>');
-            preprocess(index, slide);
+            preprocessSlide(index, slide);
         });
 
         slides.each(function (index, slide) {
-            preprocessAnchorJump(index, $(slide));
+            preprocessSlideAnchorJump(index, $(slide));
         });
 
-        $(window).resize(resizeEvent);
-        $(document).keydown(processKeydown);
-        $(window).bind('hashchange', hashUpdate);
-        $(window).on('message', processMessage);
-
-        resizeEvent();
         animated = false;
         hashUpdate();
 
         // turn on the slides
-        $("body").css('visibility', 'visible');
+        $("body").removeClass('no-slides');
+    }
 
-        if (window.opener) {
-            $(window.opener).bind('beforeunload', function(e) {
-                window.close();
-            });
-            window.opener.postMessage({ command : 'childReady' }, '*');
-        }
+    function cleanup() {
+        config = undefined;
+        slides = undefined;
+
+        $('body').addClass('no-slides');
+        $('#slides-container').empty();
+        updateStatus();
     }
 
     function resizeEvent() {
@@ -267,12 +259,16 @@ require(["jquery-ui"], function () {
     }
 
     function updateStatus() {
-        text = '<span class="status-index">' + (currentIndex + 1) + '</span>';
-        $('#status-bar').html(text);
-        hash = '#' + currentIndex + ',' + currentStep;
-        if (window.location.hash != hash)
-            window.location.replace(hash);
-        animated = animatedDefault;
+        if (slides) {
+            text = '<span class="status-index">' + (currentIndex + 1) + '</span>';
+            $('#status-bar').html(text);
+            hash = '#' + currentIndex + ',' + currentStep;
+            if (window.location.hash != hash)
+                window.location.replace(hash);
+            animated = animatedDefault;
+        } else {
+            $('#status-bar').empty();
+        }
     }
 
     function uiPrev() {
@@ -288,6 +284,8 @@ require(["jquery-ui"], function () {
     }
 
     function processKeydown(e) {
+        if (!slides) return true;
+
         var key = e.which;
         // console.log(key);
 
@@ -320,12 +318,14 @@ require(["jquery-ui"], function () {
                         .html('<a href="' + window.location +
                               '" target="_blank">Presenting Screen</a>');
                 }
-            }
+                return false;
+            }           
         }
         return true;
     }
 
     function hashUpdate (e) {
+        if (!slides) return;
         var index, step;
         if (window.location.hash.length == 0) {
             index = 0;
@@ -338,6 +338,7 @@ require(["jquery-ui"], function () {
         }
         if (index != currentIndex || step != currentStep)
             jump(index, step);
+        updateStatus();
     }
 
     function processMessage(e) {
@@ -364,13 +365,46 @@ require(["jquery-ui"], function () {
         }
     }
 
+    function init() {
+        slideFrame = $('#slide-frame');
+        slidesContainer = $('#slides-container');
+
+        var dummySlide = $('<div class="slide"></div>');
+        slideWidth  = dummySlide.width();
+        slideHeight = dummySlide.height();
+
+        $(window).resize(resizeEvent);
+        $(document).keydown(processKeydown);
+        $(window).bind('hashchange', hashUpdate);
+        $(window).on('message', processMessage);
+
+        resizeEvent();
+
+        if (window.opener) {
+            $(window.opener).bind('beforeunload', function(e) {
+                window.close();
+            });
+            window.opener.postMessage({ command : 'childReady' }, '*');
+        }
+    }
+
+    function noop(e) { 
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    function loadContent(content) {
+        $('#slides-container').html(content);
+        window.location.replace('#');
+        preprocess();
+    }
+
     $(window).ready(function () {
+        init();
         $('#slides-container').load('slides.html #slides', function (response, status, xhr) {
-            if (status == 'error') {
-                console.log('cannot load slide.html, load sample instead.');
-                $('#slides-container').load('defaults/slides.sample.html #slides', init);
-            } else {
-                init();
+            if (status == 'success') preprocess();
+            else {
+                $('#slides-container').load('defaults/slides.sample.html #slides', preprocess);
             }
         });
     });

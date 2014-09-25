@@ -1,3 +1,4 @@
-slides.md
-slides.html
-contents
+*
+!.gitignore
+!*/
+!main.html
