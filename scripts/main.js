@@ -1,5 +1,4 @@
 require(["jquery-ui"], function () {
-
     var config;
     var slides;
     var slideFrame;
@@ -12,6 +11,7 @@ require(["jquery-ui"], function () {
     var currentStep;
     var slideSteps = [];
     var archors = {};
+    var slaveMode = false;
     var controlPair = null;
     var animatedDefault;
     var animated;
@@ -57,7 +57,7 @@ require(["jquery-ui"], function () {
     function preprocessSlideAnchorJump(index, slide) {
 	    slide.find('a[href^="#"]').on('click', function (e) {
 	        e.preventDefault();
-            if (window.opener) return false;
+            if (slaveMode) return false;
             
 	        var target = this.hash.substring(1);
             if (target in archors) {
@@ -301,14 +301,14 @@ require(["jquery-ui"], function () {
             if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return true;
             // bs, left and up
             e.preventDefault();
-            if (window.opener) return false;
+            if (slaveMode) return false;
             uiPrev();
             return false;
         } else if (key == 32 || key == 39 || key == 40) {
             if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return true;
             // space, right and down
             e.preventDefault();
-            if (window.opener) return false;
+            if (slaveMode) return false;
             uiNext();
             return false;
         } else if (key == 79) {
@@ -317,7 +317,7 @@ require(["jquery-ui"], function () {
             if (e.shiftKey) 
                 options = '';
             else options = 'status=no,location=no,menubar=no,toolbar=no';
-            if (window.opener) return false;
+            if (slaveMode) return false;
             if (!controlPair) {
                 w = window.open(window.location, '', options);
                 if (!w) {
@@ -370,6 +370,12 @@ require(["jquery-ui"], function () {
                 controlPair = null;
                 deactivateController();
             });
+            controlPair.postMessage({ command : 'parentReady' }, '*');
+        } else if (data.command == 'parentReady') {
+            slaveMode = true;
+            $(controlPair).bind('beforeunload', function(e) {
+                window.close();
+            });
         }
     }
 
@@ -392,9 +398,6 @@ require(["jquery-ui"], function () {
         $(window).on('message', processMessage);
 
         if (window.opener) {
-            $(window.opener).bind('beforeunload', function(e) {
-                window.close();
-            });
             window.opener.postMessage({ command : 'childReady' }, '*');
         }
     }
@@ -413,10 +416,13 @@ require(["jquery-ui"], function () {
     $(window).ready(function () {
         init();
         $('#slides-container').load('slides.html #slides', function (response, status, xhr) {
-            if (status == 'success') preprocess();
-            else {
+            if (status == 'success') {
+                console.log('!!!');
+                preprocess();
+            } else {
                 $('#slides-container').load('defaults/slides.sample.html #slides', preprocess);
             }
         });
     });
+
 });
