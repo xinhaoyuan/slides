@@ -18,12 +18,12 @@
     position : absolute;
 }
 
-#slides[arrange="horizontal"] {
+#screen.horizontal #slides {
     white-space: nowrap;
     font-size: 0;
 }
 
-#slides[arrange="horizontal"] .slide {
+#screen.horizontal .slide {
     display        : inline-block;
     vertical-align : bottom;
 }
@@ -41,6 +41,56 @@
     top      : 0;
     bottom   : 0;
     padding  : 10px;
+}
+
+body.slave #tools-bar-container {
+    display: none;
+}
+
+#screen.vertical #tools-bar-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+}
+
+#screen.vertical #tools-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 10px;
+}
+
+#screen.vertical #tools-bar:before{ 
+    display        : inline-block;
+    height         : 100%;
+    width          : 0px;
+    vertical-align : middle;
+    content        : ''
+}
+
+#screen.vertical #tools-bar > * {
+    display: inline-block;
+    vertical-align : middle;
+}
+
+#screen.horizontal #tools-bar-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+#screen.horizontal #tools-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 10px;
+    text-align: center;
+}
+
+#screen.horizontal #tools-bar > div {
+    display: inline-block;
 }
 
 .slide.center {
@@ -90,7 +140,7 @@ body {
     background    : white;
 }
 
-#slides[arrange="horizontal"] .slide {
+#screen.horizontal .slide {
     margin-right : 30px;
 }
 
@@ -150,4 +200,34 @@ body.controller {
     padding: 5px;
     background: white;
     border-radius: 5px;
+}
+
+#btn-prev, #btn-next {
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+}
+
+#screen.vertical #btn-prev {
+    background: url("btn-prev-v.svg");
+    background-size: 50px 50px;
+    margin-bottom: 20px;
+}
+
+#screen.vertical #btn-next {
+    background: url("btn-next-v.svg");
+    background-size: 50px 50px;
+}
+
+#screen.horizontal #btn-prev {
+    display: inline-block;
+    background: url("btn-prev-h.svg");
+    background-size: 50px 50px;
+    margin-right: 20px;
+}
+
+#screen.horizontal #btn-next {
+    display: inline-block;
+    background: url("btn-next-h.svg");
+    background-size: 50px 50px;
 }

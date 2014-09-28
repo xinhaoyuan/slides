@@ -6,7 +6,7 @@ require(["jquery-ui"], function () {
     var slideWidth;
     var slideHeight;
     var slideMargin;
-    var slideArrange;
+    var slidesArrange;
     var currentIndex;
     var currentStep;
     var slideSteps = [];
@@ -101,10 +101,20 @@ require(["jquery-ui"], function () {
         resizeEvent();
     }
 
+    function activateSlave() {
+        slaveMode = true;
+        $('body').addClass('slave');
+    }
+
+    function deactivateSlave() {
+        slaveMode = false;
+        $('body').removeClass('slave');
+    }
+
     function setConfig() {
         config = $('#slides');
         if (!(slidesArrange = config.attr('arrange')))
-            slideArrange = 'horizontal';
+            slidesArrange = 'horizontal';
         if (config.attr('title')) 
             document.title = config.attr('title');
         if (!(animated = config.attr('animated'))) 
@@ -117,6 +127,9 @@ require(["jquery-ui"], function () {
     function preprocess() {
 
         setConfig();
+        $('#screen').addClass(slidesArrange);
+        console.log(slidesArrange);
+
         slides = $('.slide');
 
         if (slidesArrange == 'horizontal')
@@ -372,9 +385,10 @@ require(["jquery-ui"], function () {
             });
             controlPair.postMessage({ command : 'parentReady' }, '*');
         } else if (data.command == 'parentReady') {
-            slaveMode = true;
+            activateSlave();
             $(controlPair).bind('beforeunload', function(e) {
-                window.close();
+                controlPair = null;
+                deactivateSlave();
             });
         }
     }
@@ -397,14 +411,16 @@ require(["jquery-ui"], function () {
         $(window).bind('hashchange', hashUpdate);
         $(window).on('message', processMessage);
 
+        $('#btn-prev').click(function () {
+            if (!slaveMode) uiPrev();
+        });
+        $('#btn-next').click(function () {
+            if (!slaveMode) uiNext();
+        });
+
         if (window.opener) {
             window.opener.postMessage({ command : 'childReady' }, '*');
         }
-    }
-
-    function noop(e) { 
-        e.stopPropagation();
-        e.preventDefault();
     }
 
     function loadContent(content) {
