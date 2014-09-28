@@ -1,6 +1,6 @@
-*
-!.gitignore
-!*/
-!main.html
-!Makefile
-!generate_slides.py
+/*
+!/.gitignore
+!/*/
+!/main.html
+!/Makefile
+!/generate_slides.py
