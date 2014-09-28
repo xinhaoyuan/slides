@@ -281,8 +281,7 @@ require(["jquery-ui"], function () {
 
     function updateStatus() {
         if (slides) {
-            text = '<span class="status-index">' + (currentIndex + 1) + '</span>';
-            $('#status-bar').html(text);
+            $('#status-current-index').text(currentIndex + 1);
             hash = '#' + currentIndex + ',' + currentStep;
             if (window.location.hash != hash)
                 window.location.replace(hash);
