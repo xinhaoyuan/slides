@@ -417,7 +417,6 @@ require(["jquery-ui"], function () {
         init();
         $('#slides-container').load('slides.html #slides', function (response, status, xhr) {
             if (status == 'success') {
-                console.log('!!!');
                 preprocess();
             } else {
                 $('#slides-container').load('defaults/slides.sample.html #slides', preprocess);
