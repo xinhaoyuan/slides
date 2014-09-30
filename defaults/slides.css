@@ -129,7 +129,8 @@
 
 body {
     background : grey;
-    font-size  : 20px;
+    font-size: 20pt;
+    font-family: 'Open Sans', Arial, sans-serif;
 }
 
 .slide {
