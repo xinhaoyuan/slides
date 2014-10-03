@@ -43,56 +43,6 @@
     padding  : 10px;
 }
 
-/* body.slave #tools-bar-container { */
-/*     display: none; */
-/* } */
-
-/* #screen.vertical #tools-bar-container { */
-/*     position: absolute; */
-/*     top: 0; */
-/*     bottom: 0; */
-/*     left: 0; */
-/* } */
-
-/* #screen.vertical #tools-bar { */
-/*     position: absolute; */
-/*     top: 0; */
-/*     bottom: 0; */
-/*     right: 10px; */
-/* } */
-
-/* #screen.vertical #tools-bar:before{  */
-/*     display        : inline-block; */
-/*     height         : 100%; */
-/*     width          : 0px; */
-/*     vertical-align : middle; */
-/*     content        : '' */
-/* } */
-
-/* #screen.vertical #tools-bar > * { */
-/*     display: inline-block; */
-/*     vertical-align : middle; */
-/* } */
-
-/* #screen.horizontal #tools-bar-container { */
-/*     position: absolute; */
-/*     left: 0; */
-/*     right: 0; */
-/*     bottom: 0; */
-/* } */
-
-/* #screen.horizontal #tools-bar { */
-/*     position: absolute; */
-/*     left: 0; */
-/*     right: 0; */
-/*     top: 10px; */
-/*     text-align: center; */
-/* } */
-
-/* #screen.horizontal #tools-bar > div { */
-/*     display: inline-block; */
-/* } */
-
 .vertical-center-container {
     position: absolute;
     top: 0;
