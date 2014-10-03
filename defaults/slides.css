@@ -31,7 +31,7 @@
 .slide {
     position       : relative;
     white-space    : normal;
-    font-size      : 20px;
+    font-size      : 15pt;
 }
 
 .slide-inner {
@@ -93,12 +93,18 @@
 /*     display: inline-block; */
 /* } */
 
-.slide.center {
+.vertical-center-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    font-size: 0;
     white-space: nowrap;
 }
 
 /* for centering contents */
-.slide.center:before {
+.vertical-center-container:before {
     display        : inline-block;
     height         : 100%;
     width          : 0px;
@@ -107,14 +113,12 @@
     content        : ''
 }
 
-.slide.center .slide-inner {
+.vertical-center-container > div {
     position       : static;
     display        : inline-block;
-    text-align     : center;
     vertical-align : middle;
-    width          : 100%;
     white-space    : normal;
-    padding        : 0;
+    font-size      : 15pt;
 }
 
 #open-presenter {
